@@ -1,5 +1,5 @@
-#import networkx as nx
-#import matplotlib.pyplot as plt
+import networkx as nx
+import matplotlib.pyplot as plt
 import numpy as np
 import math
 import random
@@ -110,17 +110,17 @@ class Graph:
 
         return a_mat
 
-    # def plot(self) -> None:
-    #     mat = np.array(self.graph)
-    #     G = nx.Graph(mat)
-    #     pos = nx.circular_layout(G)
-    #     nx.draw(G, pos=pos, with_labels=True)
-    #     plt.show()
-    #
-    # def is_eulerian(self) -> bool:
-    #     mat = np.array(self.graph)
-    #     G = nx.Graph(mat)
-    #     return nx.is_eulerian(G)
+    def plot(self) -> None:
+        mat = np.array(self.graph)
+        G = nx.Graph(mat)
+        pos = nx.circular_layout(G)
+        nx.draw(G, pos=pos, with_labels=True)
+        plt.show()
+
+    def is_eulerian(self) -> bool:
+        mat = np.array(self.graph)
+        G = nx.Graph(mat)
+        return nx.is_eulerian(G)
 
     def show(self):
         print("adjacency matrix: ")
