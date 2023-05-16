@@ -21,22 +21,23 @@ def parser(command: str, graph: Graph) -> None:
             graph.show()
             input("[any]: ")
 
-        elif instruction in ['plot']:
-            graph.plot()
-
         elif instruction in ['edges']:
             graph.new_edges()
 
-        elif instruction in ["eulerian", 'euler']:
+        elif instruction in [ 'euler']:
             graph.generate_eulerian()
-            input("graph is eulerian now [any]: ")
+            input(f"graph is eulerian now [any]: ")
+
+        elif instruction in ['eulerian']:
+            temp = "" if graph.is_eulerian() else " not"
+            input(f"Graph is{temp} eulerian. [any]: ")
 
         elif instruction in ["isolate"]:
             node = graph.isolate_node()
             input(f"isolated node: {node} [any]:")
 
         elif instruction in ['h', 'help']:
-            print("plot - plot graph")
+            print("eulerian - check if graph is eulerian")
             print("isolate - isolate one node")
             print("euler - generate eulerian graph and set edges")
             print("show - print graph representations")

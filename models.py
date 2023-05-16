@@ -1,5 +1,3 @@
-#import networkx as nx
-#import matplotlib.pyplot as plt
 import numpy as np
 import math
 import random
@@ -24,8 +22,7 @@ class Graph:
     def new_edges(self):
         self.graph = self._generate(n=len(self.graph), factor=self.factor)
 
-    @staticmethod
-    def _generate(n: int, factor: float) -> list[list[int]]:
+    def _generate(self, n: int, factor: float) -> list[list[int]]:
         # generates random connected graph with hamilton cycle
         possible_edges = n * (n - 1) / 2
         fill_edges = math.floor(factor * possible_edges) - n
@@ -46,15 +43,23 @@ class Graph:
                     a_mat[a][b] = 1
                     a_mat[b][a] = 1
                     break
-        return a_mat
+        return self.a_mat2a_list(a_mat)
+    
+    @staticmethod
+    def a_mat2a_list(a_mat: list[list[int]]) -> list[list[int]]:
+        a_list = []
+        for i in range(len(a_mat)):
+            adjacencies = []
+            for j in range(len(a_mat[i])):
+                if a_mat[i][j] == 1:
+                    adjacencies.append(j)
+            a_list.append(adjacencies)
+        return a_list
 
     def isolate_node(self) -> int:
         n = len(self.graph)
         node = random.randint(1, n) - 1
-
-        for i in range(n):
-            self.graph[i][node] = 0
-            self.graph[node][i] = 0
+        self.graph[node] = []
         return node
 
     def generate_eulerian(self, n=None, factor=None) -> None:
@@ -90,10 +95,9 @@ class Graph:
                     break
         a_mat[last][end_of_cycle] = 1
         a_mat[end_of_cycle][last] = 1
-        self.graph = a_mat
+        self.graph = self.a_mat2a_list(a_mat)
 
-    @staticmethod
-    def _input_graph():  # -> bool | list[list[int]]:
+    def _input_graph(self):  # -> bool | list[list[int]]:
         a_mat = []
         n = int(input("Set size [int]: "))
         print("input adjacency matrix:")
@@ -108,21 +112,16 @@ class Graph:
                 print("One or more not integer values.")
                 return False
 
-        return a_mat
+        return self.a_mat2a_list(a_mat)
 
-    # def plot(self) -> None:
-    #     mat = np.array(self.graph)
-    #     G = nx.Graph(mat)
-    #     pos = nx.circular_layout(G)
-    #     nx.draw(G, pos=pos, with_labels=True)
-    #     plt.show()
-    #
-    # def is_eulerian(self) -> bool:
-    #     mat = np.array(self.graph)
-    #     G = nx.Graph(mat)
-    #     return nx.is_eulerian(G)
+
+    def is_eulerian(self) -> bool:
+        for row in self.graph:
+            if len(row)%2 != 0:
+                return False
+        return True
 
     def show(self):
         print("adjacency matrix: ")
-        for row in self.graph:
-            print(row)
+        for row, nodes in enumerate(self.graph):
+            print(f"{row}: {nodes}")
