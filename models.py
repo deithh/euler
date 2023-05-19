@@ -174,8 +174,4 @@ class Graph:
         ptr -=1
 
 
-g = Graph()
-g.init_edges(.3, False, 12)
-g.isolate_node()
-g.ham_cycle("all")
 
