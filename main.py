@@ -3,7 +3,7 @@ import threading
 from models import *
 import os
 
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(20000)
 threading.stack_size(0x2000000)
 
 
@@ -24,9 +24,30 @@ def parser(command: str, graph: Graph) -> None:
         elif instruction in ['edges']:
             graph.new_edges()
 
-        elif instruction in [ 'euler']:
+        elif instruction in ['euler']:
             graph.generate_eulerian()
             input(f"graph is eulerian now [any]: ")
+
+        elif instruction in ["epath"]:
+            t = threading.Thread(target=graph.euler_cycle)
+            t.start()
+            t.join()
+            input("[any]: ")
+
+        elif instruction in ["hpath_count"]:
+            print("found ", end = "")
+            t = threading.Thread(target=graph.ham_cycle, args = ("count",))
+            t.start()
+            t.join()
+            print(" cycless")
+            input("[any]: ")
+
+        elif instruction in ["hpath"]:
+            t = threading.Thread(target=graph.ham_cycle, args = ("all",))
+            t.start()
+            t.join()
+            input("[any]: ")
+
 
         elif instruction in ['eulerian']:
             temp = "" if graph.is_eulerian() else " not"
@@ -41,6 +62,9 @@ def parser(command: str, graph: Graph) -> None:
             print("isolate - isolate one node")
             print("euler - generate eulerian graph and set edges")
             print("show - print graph representations")
+            print("epath - find eulerian cycle")
+            print("hpath - find all hamiltonian cycles")
+            print("hpath_count - find all hamiltonian cycles prints only their count")
             input("[any]: ")
 
         else:
@@ -51,6 +75,7 @@ def main() -> None:
     graph = Graph()
     menu: str = 'default'
     factor = 0
+
 
     while True:
 
@@ -121,6 +146,4 @@ def main() -> None:
     clear()
 
 
-t = threading.Thread(target=main())
-t.start()
-t.join()
+main()

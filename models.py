@@ -125,3 +125,57 @@ class Graph:
         print("adjacency matrix: ")
         for row, nodes in enumerate(self.graph):
             print(f"{row}: {nodes}")
+    
+
+    def euler_cycle(self):
+        if not self.is_eulerian():
+            print("graph is not eulerian.")
+            return
+        cycle = []
+        self._euler_cycle(node = 0, ptrs = [0] * len(self.graph), used = set(), cycle = cycle)
+        print(f"found euler cycle: {cycle}")
+
+    def _euler_cycle(self, node, ptrs, used, cycle):
+        while ptrs[node] < len(self.graph[node]):
+            next_ = self.graph[node][ptrs[node]]
+            ptrs[node]+=1
+            if (next_, node) in used:
+                continue
+            used.add((next_, node))
+            used.add((node, next_))
+
+            self._euler_cycle(node = next_, ptrs = ptrs, used = used, cycle = cycle)
+
+
+        cycle.append(node)
+
+    def ham_cycle(self, mode):
+        cycle = [0] * len(self.graph)
+        nb = [0]
+        self._ham_cycle(node = 0, visited = [0] * len(self.graph), cycle = cycle, mode = mode,nb = nb)
+        if mode == "count":
+            print(*nb, end = "")
+
+    def _ham_cycle(self, node, visited, cycle, nb, mode, ptr = 0): # 0 is set as starting point
+        cycle[ptr] = node
+        ptr +=1
+        if ptr == len(self.graph):
+            for next_ in self.graph[node]:
+                if next_ == 0:
+                    nb[0] += 1
+                    if mode == 'all':
+                        print(f"cycle: {cycle+[0]}")
+        else:
+            visited[node] = 1
+            for next_ in self.graph[node]:
+                if visited[next_] == 0:
+                    self._ham_cycle(next_, visited, cycle, nb, mode, ptr)
+            visited[node] = 0
+        ptr -=1
+
+
+g = Graph()
+g.init_edges(.3, False, 12)
+g.isolate_node()
+g.ham_cycle("all")
+
