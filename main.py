@@ -34,16 +34,8 @@ def parser(command: str, graph: Graph) -> None:
             t.join()
             input("[any]: ")
 
-        elif instruction in ["hpath_count"]:
-            print("found ", end = "")
-            t = threading.Thread(target=graph.ham_cycle, args = ("count",))
-            t.start()
-            t.join()
-            print(" cycless")
-            input("[any]: ")
-
         elif instruction in ["hpath"]:
-            t = threading.Thread(target=graph.ham_cycle, args = ("all",))
+            t = threading.Thread(target=graph.ham_cycle)
             t.start()
             t.join()
             input("[any]: ")
@@ -64,7 +56,6 @@ def parser(command: str, graph: Graph) -> None:
             print("show - print graph representations")
             print("epath - find eulerian cycle")
             print("hpath - find all hamiltonian cycles")
-            print("hpath_count - find all hamiltonian cycles prints only their count")
             input("[any]: ")
 
         else:

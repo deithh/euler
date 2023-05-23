@@ -2,7 +2,6 @@ import numpy as np
 import math
 import random
 
-
 class Graph:
 
     def __init__(self) -> None:
@@ -68,33 +67,39 @@ class Graph:
         if factor is None:
             factor = self.factor
         possible_edges = n * (n - 1) / 2
-        fill_edges = math.floor(factor * possible_edges) - n
-        if fill_edges - 1 < 0:
+        fill_edges = (math.floor(factor * possible_edges) - n)//3
+
+        if fill_edges <= 0:
             input("Cant do this [any]:")
+            #check if this configuration of n and factor is possible
+
         a_mat = [[0 for _ in range(n)] for _ in range(n)]
 
+        #make graph connected
         nodes = [i for i in range(n)]
         np.random.shuffle(nodes)
         last = nodes[-1]
-        end_of_cycle = last
-        nodes = nodes[:-1]
         for node in nodes:
             a_mat[last][node] = 1
             a_mat[node][last] = 1
             last = node
 
-        for i in range(fill_edges - 1):
+        #fill edges using random 3-cycles
+
+        for i in range(fill_edges):
             while 1:
-                next = random.choice(nodes)
-                if a_mat[last][next] != 1 and last != next:
-                    if i == fill_edges - 2 and next == end_of_cycle or a_mat[next][end_of_cycle]:
-                        continue
-                    a_mat[last][next] = 1
-                    a_mat[next][last] = 1
-                    last = next
+                a, b, c = [random.choice(nodes) for i in range(3)]
+                if a!=b and a!=c and b!=c and\
+                not a_mat[a][b] and not a_mat[c][b]\
+                and not a_mat[a][c]:
                     break
-        a_mat[last][end_of_cycle] = 1
-        a_mat[end_of_cycle][last] = 1
+            a_mat[a][b] = 1
+            a_mat[b][a] = 1
+            a_mat[a][c] = 1
+            a_mat[c][a] = 1
+            a_mat[c][b] = 1
+            a_mat[b][c] = 1
+
         self.graph = self.a_mat2a_list(a_mat)
 
     def _input_graph(self):  # -> bool | list[list[int]]:
@@ -127,13 +132,14 @@ class Graph:
             print(f"{row}: {nodes}")
     
 
-    def euler_cycle(self):
+    def euler_cycle(self, mode = "normal"):
         if not self.is_eulerian():
             print("graph is not eulerian.")
             return
         cycle = []
         self._euler_cycle(node = 0, ptrs = [0] * len(self.graph), used = set(), cycle = cycle)
-        print(f"found euler cycle: {cycle}")
+        if mode == "normal":
+            print(f"found eulerian cycle: {cycle}")
 
     def _euler_cycle(self, node, ptrs, used, cycle):
         while ptrs[node] < len(self.graph[node]):
@@ -149,29 +155,35 @@ class Graph:
 
         cycle.append(node)
 
-    def ham_cycle(self, mode):
-        cycle = [0] * len(self.graph)
-        nb = [0]
-        self._ham_cycle(node = 0, visited = [0] * len(self.graph), cycle = cycle, mode = mode,nb = nb)
-        if mode == "count":
-            print(*nb, end = "")
+    def ham_cycle(self, mode="normal"):
+        num_nodes = len(self.graph)
+        visited = [0] * num_nodes
+        cycle = [0] * num_nodes
+        flag = self._ham_cycle(0, visited, cycle)
+        
+        if mode == "normal":
+            if flag:
+                print(f"Found Hamiltonian cycle: {cycle + [0]}")
+            else:
+                print("Hamiltonian cycle not found")
 
-    def _ham_cycle(self, node, visited, cycle, nb, mode, ptr = 0): # 0 is set as starting point
+    def _ham_cycle(self, node, visited, cycle, ptr = 0): # 0 is set as starting point
         cycle[ptr] = node
         ptr +=1
         if ptr == len(self.graph):
-            for next_ in self.graph[node]:
-                if next_ == 0:
-                    nb[0] += 1
-                    if mode == 'all':
-                        print(f"cycle: {cycle+[0]}")
-        else:
-            visited[node] = 1
-            for next_ in self.graph[node]:
-                if visited[next_] == 0:
-                    self._ham_cycle(next_, visited, cycle, nb, mode, ptr)
-            visited[node] = 0
+            if 0 in self.graph[node]:
+                return True
+            return False
+            
+        visited[node] = 1
+        
+        for next_ in self.graph[node]:
+            if visited[next_] == 0:
+                if self._ham_cycle(next_, visited, cycle, ptr):
+                    return True
+                
+        visited[node] = 0
         ptr -=1
-
+        return False
 
 
